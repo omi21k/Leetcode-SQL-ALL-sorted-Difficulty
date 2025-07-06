@@ -34,3 +34,31 @@ where salary not in
 -- apple- 2
 -- mckinsey- 2
 -- amdocs- 2
+
+-- Using dense rank
+    
+SELECT DISTINCT salary AS SecondHighestSalary
+FROM (
+    SELECT salary, DENSE_RANK() OVER (ORDER BY salary DESC) AS rnk
+    FROM Employee
+) ranked
+WHERE rnk = 2;
+
+--using self join
+
+SELECT MAX(e1.salary) AS SecondHighestSalary
+FROM Employee e1
+JOIN (SELECT MAX(salary) AS max_salary FROM Employee) e2
+ON e1.salary < e2.max_salary;
+
+
+--using CTE
+
+WITH RankedSalaries AS (
+    SELECT salary, DENSE_RANK() OVER (ORDER BY salary DESC) AS rnk
+    FROM Employee
+)
+SELECT salary AS SecondHighestSalary
+FROM RankedSalaries
+WHERE rnk = 2
+LIMIT 1;
